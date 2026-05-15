@@ -3,543 +3,83 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#101624" />
+  <meta name="theme-color" content="#0b101a" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Apex Tuner" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="description" content="A mobile first unofficial racing game tuning helper." />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
+  <meta name="description" content="A mobile first unofficial racing game tune generator." />
   <title>Apex Tuner</title>
   <style>
-    :root {
-      --bg: #0b101a;
-      --bg-soft: #101624;
-      --card: #151c2b;
-      --card-soft: #192235;
-      --field: #111827;
-      --line: rgba(255,255,255,.09);
-      --line-strong: rgba(255,255,255,.15);
-      --text: #f6f7fb;
-      --muted: #9ba7b8;
-      --soft: #c8d0dc;
-      --accent: #63d2ff;
-      --accent-soft: rgba(99,210,255,.14);
-      --good: #78f0b8;
-      --bad: #ff708d;
-      --shadow: 0 18px 40px rgba(0,0,0,.28);
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
-      --radius: 22px;
-    }
-
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html { scroll-behavior: smooth; }
-    body {
-      margin: 0;
-      min-height: 100vh;
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: linear-gradient(180deg, #111827 0%, #0b101a 52%, #070a12 100%);
-      overflow-x: hidden;
-    }
-
-    button, input, select { font: inherit; }
-    button { border: 0; cursor: pointer; color: inherit; }
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      padding: calc(8px + var(--safe-top)) 14px 8px;
-      background: rgba(11,16,26,.86);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--line);
-    }
-
-    .top-inner {
-      width: min(860px, 100%);
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
-    .mark {
-      width: 38px;
-      height: 38px;
-      display: grid;
-      place-items: center;
-      flex: 0 0 auto;
-      border-radius: 13px;
-      color: var(--accent);
-      background: var(--accent-soft);
-      border: 1px solid rgba(99,210,255,.22);
-    }
-    .mark svg { width: 22px; height: 22px; }
-    h1 { margin: 0; font-size: 1.18rem; letter-spacing: -.035em; line-height: 1; }
-    .subline { margin: 4px 0 0; color: var(--muted); font-size: .76rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 210px; }
-    .version { color: var(--muted); font-size: .72rem; font-weight: 750; padding: 7px 9px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.04); }
-
-    .app { width: min(860px, 100%); margin: 0 auto; padding: 14px 14px calc(94px + var(--safe-bottom)); }
-    .page { display: none; animation: fade .16s ease; }
-    .page.active { display: grid; gap: 14px; }
-    @keyframes fade { from { opacity: .6; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
-
-    .hero-card, .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .hero-card { padding: 15px; background: linear-gradient(180deg, #182033, #121827); }
-    .eyebrow { margin: 0 0 5px; color: var(--accent); font-size: .72rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
-    h2 { margin: 0; font-size: 1.24rem; letter-spacing: -.035em; line-height: 1.1; }
-    h3 { margin: 0; font-size: 1rem; letter-spacing: -.02em; }
-    .hint { margin: 5px 0 0; color: var(--muted); font-size: .86rem; line-height: 1.36; }
-
-    .summary-row { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 13px; }
-    .summary-pill {
-      min-width: 0;
-      border-radius: 17px;
-      padding: 10px;
-      background: rgba(255,255,255,.055);
-      border: 1px solid var(--line);
-    }
-    .summary-pill b { display: block; color: var(--muted); font-size: .72rem; font-weight: 740; }
-    .summary-pill span { display: block; margin-top: 3px; color: var(--soft); font-size: .96rem; font-weight: 860; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-    .card-head { display: flex; align-items: center; gap: 11px; padding: 14px; border-bottom: 1px solid var(--line); }
-    .icon { width: 37px; height: 37px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 13px; color: var(--accent); background: var(--accent-soft); border: 1px solid rgba(99,210,255,.18); }
-    .icon svg { width: 21px; height: 21px; }
-    .body { padding: 14px; display: grid; gap: 13px; }
-    .grid2 { display: grid; grid-template-columns: 1fr; gap: 10px; }
-    .grid2.buttons, .buttons { grid-template-columns: repeat(2, 1fr); }
-
-    .control { display: grid; gap: 7px; }
-    label { color: var(--soft); font-size: .82rem; font-weight: 760; }
-    input[type="number"], input[type="text"], select {
-      width: 100%;
-      min-height: 47px;
-      color: var(--text);
-      background: var(--field);
-      border: 1px solid var(--line-strong);
-      border-radius: 16px;
-      padding: 12px 13px;
-      outline: none;
-    }
-    input:focus, select:focus { border-color: rgba(99,210,255,.65); box-shadow: 0 0 0 4px rgba(99,210,255,.11); }
-
-    .btn {
-      min-height: 47px;
-      border-radius: 16px;
-      font-weight: 830;
-      background: var(--accent-soft);
-      border: 1px solid rgba(99,210,255,.24);
-      color: var(--text);
-    }
-    .btn.secondary { background: rgba(255,255,255,.055); border-color: var(--line); color: var(--soft); }
-    .btn.danger { background: rgba(255,112,141,.11); border-color: rgba(255,112,141,.26); color: #ffd9e2; }
-
-    .section-grid { display: grid; gap: 12px; }
-    .tune-card { background: var(--card); border: 1px solid var(--line); border-radius: 21px; overflow: hidden; box-shadow: var(--shadow); }
-    .tune-card summary { list-style: none; cursor: pointer; padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-    .tune-card summary::-webkit-details-marker { display: none; }
-    .section-title { display: flex; align-items: center; gap: 10px; min-width: 0; }
-    .section-title div { min-width: 0; }
-    .section-title .hint { margin-top: 3px; }
-    .chev { color: var(--muted); transition: transform .16s ease; }
-    details[open] .chev { transform: rotate(180deg); }
-    .section-controls { padding: 0 14px 14px; display: grid; gap: 14px; }
-    .label-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-    .value { color: var(--good); font-weight: 900; font-variant-numeric: tabular-nums; }
-    input[type="range"] { width: 100%; accent-color: var(--accent); }
-
-    .helper-result { padding: 13px; border-radius: 17px; background: rgba(99,210,255,.09); border: 1px solid rgba(99,210,255,.18); color: #eaf8ff; line-height: 1.45; }
-    .preset-list { display: grid; gap: 9px; }
-    .preset-item { display: grid; gap: 9px; padding: 11px; border-radius: 17px; background: rgba(255,255,255,.052); border: 1px solid var(--line); }
-    .preset-name { font-weight: 830; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .preset-meta { color: var(--muted); font-size: .78rem; }
-    .preset-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-
-    .small-note { color: var(--muted); font-size: .76rem; line-height: 1.38; text-align: center; padding: 4px 8px 0; }
-
-    .tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 9px 12px calc(9px + var(--safe-bottom)); background: rgba(9,13,22,.86); backdrop-filter: blur(22px); border-top: 1px solid var(--line); }
-    .tabs { width: min(620px, 100%); margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-    .tab {
-      min-height: 56px;
-      display: grid;
-      place-items: center;
-      gap: 2px;
-      border-radius: 18px;
-      color: var(--muted);
-      background: transparent;
-      font-size: .74rem;
-      font-weight: 800;
-    }
-    .tab.active { color: var(--text); background: rgba(255,255,255,.075); border: 1px solid var(--line); }
-    .tab svg { width: 19px; height: 19px; }
-
-    @media (min-width: 740px) {
-      .grid2 { grid-template-columns: repeat(2, 1fr); }
-      .section-grid { grid-template-columns: repeat(2, 1fr); }
-    }
+    :root{--bg:#0b101a;--card:#151c2b;--card2:#192235;--field:#101827;--line:rgba(255,255,255,.1);--line2:rgba(255,255,255,.16);--text:#f7f8fc;--muted:#99a6b8;--soft:#cad2df;--accent:#66d9ff;--accent2:#8b7cff;--good:#78f0b8;--bad:#ff708d;--shadow:0 18px 42px rgba(0,0,0,.28);--radius:22px;--safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px)}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,#111827,#0b101a 55%,#070a12);overflow-x:hidden}button,input,select{font:inherit}button{border:0;cursor:pointer;color:inherit}.topbar{position:sticky;top:0;z-index:20;padding:calc(8px + var(--safe-top)) 14px 8px;background:rgba(11,16,26,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--line)}.top-inner{width:min(860px,100%);margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{display:flex;align-items:center;gap:10px;min-width:0}.mark{width:38px;height:38px;display:grid;place-items:center;flex:0 0 auto;border-radius:13px;color:var(--accent);background:rgba(102,217,255,.12);border:1px solid rgba(102,217,255,.23)}.mark svg{width:22px;height:22px}h1{margin:0;font-size:1.18rem;letter-spacing:-.035em;line-height:1}.subline{margin:4px 0 0;color:var(--muted);font-size:.76rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:215px}.version{color:var(--muted);font-size:.72rem;font-weight:800;padding:7px 9px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.04)}.app{width:min(860px,100%);margin:0 auto;padding:14px 14px calc(96px + var(--safe-bottom))}.page{display:none;animation:fade .16s ease}.page.active{display:grid;gap:14px}@keyframes fade{from{opacity:.6;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}.hero,.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}.hero{padding:15px;background:linear-gradient(180deg,#182033,#121827)}.eyebrow{margin:0 0 5px;color:var(--accent);font-size:.72rem;font-weight:850;letter-spacing:.08em;text-transform:uppercase}h2{margin:0;font-size:1.24rem;letter-spacing:-.035em;line-height:1.1}h3{margin:0;font-size:1rem;letter-spacing:-.02em}.hint{margin:5px 0 0;color:var(--muted);font-size:.86rem;line-height:1.36}.summary{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px}.summary-pill{min-width:0;border-radius:17px;padding:10px;background:rgba(255,255,255,.055);border:1px solid var(--line)}.summary-pill b{display:block;color:var(--muted);font-size:.72rem;font-weight:740}.summary-pill span{display:block;margin-top:3px;color:var(--soft);font-size:.95rem;font-weight:860;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.card-head{display:flex;align-items:center;gap:11px;padding:14px;border-bottom:1px solid var(--line)}.icon{width:37px;height:37px;display:grid;place-items:center;flex:0 0 auto;border-radius:13px;color:var(--accent);background:rgba(102,217,255,.11);border:1px solid rgba(102,217,255,.2)}.icon svg{width:21px;height:21px}.body{padding:14px;display:grid;gap:13px}.grid2{display:grid;grid-template-columns:1fr;gap:10px}.grid2.buttons,.buttons{grid-template-columns:repeat(2,1fr)}.control{display:grid;gap:7px}label{color:var(--soft);font-size:.82rem;font-weight:760}input[type=number],input[type=text],select{width:100%;min-height:47px;color:var(--text);background:var(--field);border:1px solid var(--line2);border-radius:16px;padding:12px 13px;outline:none}input:focus,select:focus{border-color:rgba(102,217,255,.7);box-shadow:0 0 0 4px rgba(102,217,255,.11)}.btn{min-height:47px;border-radius:16px;font-weight:840;background:rgba(102,217,255,.14);border:1px solid rgba(102,217,255,.28);color:var(--text)}.btn.secondary{background:rgba(255,255,255,.055);border-color:var(--line);color:var(--soft)}.btn.danger{background:rgba(255,112,141,.11);border-color:rgba(255,112,141,.26);color:#ffd9e2}.btn.full{width:100%}.results-grid{display:grid;gap:12px}.result-card{background:var(--card);border:1px solid var(--line);border-radius:21px;overflow:hidden;box-shadow:var(--shadow)}.result-head{display:flex;align-items:center;gap:10px;padding:13px;border-bottom:1px solid var(--line)}.result-body{display:grid}.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:11px 13px;border-bottom:1px solid rgba(255,255,255,.065)}.row:last-child{border-bottom:0}.row span:first-child{color:var(--soft);font-size:.88rem}.row strong{color:var(--good);font-size:.92rem;font-variant-numeric:tabular-nums;text-align:right}.helper-result{padding:13px;border-radius:17px;background:rgba(102,217,255,.09);border:1px solid rgba(102,217,255,.18);color:#eaf8ff;line-height:1.45}.preset-list{display:grid;gap:9px}.preset-item{display:grid;gap:9px;padding:11px;border-radius:17px;background:rgba(255,255,255,.052);border:1px solid var(--line)}.preset-name{font-weight:830;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.preset-meta{color:var(--muted);font-size:.78rem}.preset-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.small-note{color:var(--muted);font-size:.76rem;line-height:1.38;text-align:center;padding:4px 8px 0}.tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;padding:9px 12px calc(9px + var(--safe-bottom));background:rgba(9,13,22,.88);backdrop-filter:blur(22px);border-top:1px solid var(--line)}.tabs{width:min(620px,100%);margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.tab{min-height:56px;display:grid;place-items:center;gap:2px;border-radius:18px;color:var(--muted);background:transparent;font-size:.74rem;font-weight:800}.tab.active{color:var(--text);background:rgba(255,255,255,.075);border:1px solid var(--line)}.tab svg{width:19px;height:19px}@media(min-width:740px){.grid2{grid-template-columns:repeat(2,1fr)}.results-grid{grid-template-columns:repeat(2,1fr)}}
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="top-inner">
-      <div class="brand">
-        <div class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 15l2-5.4A3 3 0 0 1 8.8 7.8h6.4A3 3 0 0 1 18 9.6l2 5.4" stroke="currentColor" stroke-width="1.8"/><path d="M6 15h12v3H6z" stroke="currentColor" stroke-width="1.8"/><circle cx="8" cy="18" r="1.25" fill="currentColor"/><circle cx="16" cy="18" r="1.25" fill="currentColor"/></svg></div>
-        <div><h1>Apex Tuner</h1><p class="subline" id="topProfile">Forza Horizon 5 · Street</p></div>
-      </div>
-      <div class="version">v0.6</div>
-    </div>
-  </header>
-
+  <header class="topbar"><div class="top-inner"><div class="brand"><div class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M4 15l2-5.4A3 3 0 0 1 8.8 7.8h6.4A3 3 0 0 1 18 9.6l2 5.4" stroke="currentColor" stroke-width="1.8"/><path d="M6 15h12v3H6z" stroke="currentColor" stroke-width="1.8"/><circle cx="8" cy="18" r="1.25" fill="currentColor"/><circle cx="16" cy="18" r="1.25" fill="currentColor"/></svg></div><div><h1>Apex Tuner</h1><p class="subline" id="topProfile">FH5 · Street · AWD</p></div></div><div class="version">v0.7</div></div></header>
   <main class="app">
-    <section class="page active" id="page-setup">
-      <div class="hero-card">
-        <p class="eyebrow">Current Setup</p>
-        <h2 id="profileTitle">Forza Horizon 5 Street</h2>
-        <p class="hint">Pick the game and tune style, then apply a baseline when you want the app to reset the sliders to that style.</p>
-        <div class="summary-row">
-          <div class="summary-pill"><b>Surface</b><span id="surfaceStat">Road</span></div>
-          <div class="summary-pill"><b>Tune Sections</b><span id="sectionStat">9</span></div>
-        </div>
-      </div>
-
-      <section class="card">
-        <div class="card-head"><div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16M4 12h16M4 19h16" stroke="currentColor" stroke-width="1.8"/></svg></div><div><h3>Profile</h3><p class="hint">Game and build type.</p></div></div>
-        <div class="body grid2">
-          <div class="control"><label for="gameSelect">Game</label><select id="gameSelect"></select></div>
-          <div class="control"><label for="typeSelect">Tune Type</label><select id="typeSelect"></select></div>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="card-head"><div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 17h16M7 17l2-9h6l2 9" stroke="currentColor" stroke-width="1.7"/><path d="M9 12h6" stroke="currentColor" stroke-width="1.7"/></svg></div><div><h3>Baseline</h3><p class="hint">Start values based on weight, balance, and tune type.</p></div></div>
-        <div class="body">
-          <div class="grid2">
-            <div class="control"><label for="weight">Weight lb</label><input id="weight" type="number" value="3200" min="1000" max="8000"></div>
-            <div class="control"><label for="frontWeight">Front Weight %</label><input id="frontWeight" type="number" value="52" min="1" max="99"></div>
-          </div>
-          <div class="grid2 buttons"><button class="btn" onclick="applyBaseline()">Apply Baseline</button><button class="btn secondary" onclick="resetTune()">Reset</button></div>
-        </div>
-      </section>
+    <section class="page active" id="page-build">
+      <div class="hero"><p class="eyebrow">Build Setup</p><h2>Enter the car details</h2><p class="hint">This is the part that matters: give the app the car and race type, then it generates a copy sheet for the game.</p><div class="summary"><div class="summary-pill"><b>Current</b><span id="summaryBuild">FH5 Street</span></div><div class="summary-pill"><b>Goal</b><span id="summaryGoal">Balanced</span></div></div></div>
+      <section class="card"><div class="card-head"><div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16M4 12h16M4 19h16" stroke="currentColor" stroke-width="1.8"/></svg></div><div><h3>Race Setup</h3><p class="hint">Game, event type, and class target.</p></div></div><div class="body grid2"><div class="control"><label for="gameSelect">Game</label><select id="gameSelect"></select></div><div class="control"><label for="raceType">Race Type</label><select id="raceType"></select></div><div class="control"><label for="classTarget">Class</label><select id="classTarget"><option>D</option><option>C</option><option>B</option><option selected>A</option><option>S1</option><option>S2</option><option>X</option></select></div><div class="control"><label for="goalSelect">Tune Goal</label><select id="goalSelect"><option selected>Balanced</option><option>Grip</option><option>Rotation</option><option>Stability</option><option>Acceleration</option><option>Top Speed</option></select></div></div></section>
+      <section class="card"><div class="card-head"><div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 15l2-5.4A3 3 0 0 1 8.8 7.8h6.4A3 3 0 0 1 18 9.6l2 5.4" stroke="currentColor" stroke-width="1.8"/><path d="M6 15h12v3H6z" stroke="currentColor" stroke-width="1.8"/></svg></div><div><h3>Car Info</h3><p class="hint">Use the game stats screen if you have them.</p></div></div><div class="body grid2"><div class="control"><label for="drivetrain">Drivetrain</label><select id="drivetrain"><option>FWD</option><option>RWD</option><option selected>AWD</option></select></div><div class="control"><label for="engineLayout">Engine Layout</label><select id="engineLayout"><option selected>Front</option><option>Mid</option><option>Rear</option></select></div><div class="control"><label for="weight">Weight lb</label><input id="weight" type="number" value="3200" min="1000" max="8000"></div><div class="control"><label for="frontWeight">Front Weight %</label><input id="frontWeight" type="number" value="52" min="1" max="99"></div><div class="control"><label for="power">Power hp</label><input id="power" type="number" value="500" min="50" max="3000"></div><div class="control"><label for="tireCompound">Tire Compound</label><select id="tireCompound"><option>Street</option><option>Sport</option><option selected>Race</option><option>Slick</option><option>Rally</option><option>Drag</option><option>Drift</option></select></div><div class="control"><label for="aeroPackage">Aero Installed</label><select id="aeroPackage"><option>None</option><option>Front Only</option><option>Rear Only</option><option selected>Front and Rear</option></select></div><div class="control"><label for="transmission">Transmission</label><select id="transmission"><option>Stock</option><option selected>Race Transmission</option></select></div></div></section>
+      <button class="btn full" onclick="generateTune(true)">Generate Tune</button>
     </section>
 
-    <section class="page" id="page-tune">
-      <div class="hero-card">
-        <p class="eyebrow">Tune</p>
-        <h2>Adjust the car</h2>
-        <p class="hint">Open a section, tweak the sliders, and save the tune from the Garage tab.</p>
-      </div>
-      <div class="section-grid" id="sections"></div>
-    </section>
+    <section class="page" id="page-results"><div class="hero"><p class="eyebrow">Generated Tune</p><h2 id="resultsTitle">No tune generated yet</h2><p class="hint" id="resultsHint">Go to Build and tap Generate Tune. These values are meant to be copied into the game as a strong starting tune.</p></div><div class="results-grid" id="resultsGrid"></div></section>
 
-    <section class="page" id="page-fix">
-      <div class="hero-card">
-        <p class="eyebrow">Handling Fix</p>
-        <h2>What is the car doing?</h2>
-        <p class="hint">Use this as a quick direction guide. Make one or two small changes, then test again.</p>
-      </div>
-      <section class="card">
-        <div class="body">
-          <div class="control"><label for="issue">Problem</label><select id="issue" onchange="showFix()"><option value="under-entry">Understeer entering corners</option><option value="under-mid">Understeer mid corner</option><option value="under-exit">Understeer on exit</option><option value="over-entry">Oversteer entering corners</option><option value="over-mid">Oversteer mid corner</option><option value="over-exit">Oversteer on exit</option><option value="unstable">Car feels twitchy or unstable</option></select></div>
-          <div class="helper-result" id="fixText"></div>
-        </div>
-      </section>
-    </section>
+    <section class="page" id="page-fix"><div class="hero"><p class="eyebrow">Handling Fix</p><h2>After testing, what feels wrong?</h2><p class="hint">Use this after you drive the generated setup. Make one or two changes, test again, then save the preset.</p></div><section class="card"><div class="body"><div class="control"><label for="issue">Problem</label><select id="issue" onchange="showFix()"><option value="under-entry">Understeer entering corners</option><option value="under-mid">Understeer mid corner</option><option value="under-exit">Understeer on exit</option><option value="over-entry">Oversteer entering corners</option><option value="over-mid">Oversteer mid corner</option><option value="over-exit">Oversteer on exit</option><option value="unstable">Car feels twitchy or unstable</option></select></div><div class="helper-result" id="fixText"></div></div></section></section>
 
-    <section class="page" id="page-garage">
-      <div class="hero-card">
-        <p class="eyebrow">Garage</p>
-        <h2>Saved tunes</h2>
-        <p class="hint">Presets are saved only on this phone or browser.</p>
-      </div>
-      <section class="card">
-        <div class="body">
-          <div class="control"><label for="presetName">Preset Name</label><input id="presetName" type="text" placeholder="Example: A800 Road Grip"></div>
-          <div class="grid2 buttons"><button class="btn" onclick="savePreset()">Save Tune</button><button class="btn danger" onclick="clearPresets()">Clear All</button></div>
-          <div class="preset-list" id="presetList"></div>
-        </div>
-      </section>
-      <section class="card">
-        <div class="body">
-          <button class="btn secondary" onclick="reloadApp()">Reload Latest Version</button>
-          <p class="small-note">If the Home Screen shortcut acts stubborn, this tries to refresh the app cache without deleting your saved tunes.</p>
-        </div>
-      </section>
-      <p class="small-note">Unofficial fan made tuning helper. Not affiliated with, endorsed by, or connected to any racing game publisher or vehicle manufacturer.</p>
-    </section>
+    <section class="page" id="page-garage"><div class="hero"><p class="eyebrow">Garage</p><h2>Save and load tunes</h2><p class="hint">Presets save only on this phone or browser.</p></div><section class="card"><div class="body"><div class="control"><label for="presetName">Preset Name</label><input id="presetName" type="text" placeholder="Example: Camaro A800 Road"></div><div class="grid2 buttons"><button class="btn" onclick="savePreset()">Save Current Tune</button><button class="btn danger" onclick="clearPresets()">Clear All</button></div><div class="preset-list" id="presetList"></div></div></section><section class="card"><div class="body"><button class="btn secondary" onclick="reloadApp()">Reload Latest Version</button><p class="small-note">Home Screen shortcuts can cache old files. This tries to reload the newest version without deleting saved tunes.</p></div></section><p class="small-note">Unofficial fan made tuning helper. Not affiliated with, endorsed by, or connected to any racing game publisher or vehicle manufacturer.</p></section>
   </main>
-
-  <nav class="tabbar" aria-label="Main navigation">
-    <div class="tabs">
-      <button class="tab active" data-tab="setup"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16M4 12h16M4 19h16" stroke="currentColor" stroke-width="1.8"/></svg><span>Setup</span></button>
-      <button class="tab" data-tab="tune"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 4a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z" stroke="currentColor" stroke-width="1.7"/></svg><span>Tune</span></button>
-      <button class="tab" data-tab="fix"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18M4 12h16" stroke="currentColor" stroke-width="1.8"/></svg><span>Fix</span></button>
-      <button class="tab" data-tab="garage"><svg viewBox="0 0 24 24" fill="none"><path d="M5 4h11l3 3v13H5z" stroke="currentColor" stroke-width="1.7"/></svg><span>Garage</span></button>
-    </div>
-  </nav>
+  <nav class="tabbar" aria-label="Main navigation"><div class="tabs"><button class="tab active" data-tab="build"><svg viewBox="0 0 24 24" fill="none"><path d="M4 5h16M4 12h16M4 19h16" stroke="currentColor" stroke-width="1.8"/></svg><span>Build</span></button><button class="tab" data-tab="results"><svg viewBox="0 0 24 24" fill="none"><path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5" stroke="currentColor" stroke-width="1.7"/></svg><span>Results</span></button><button class="tab" data-tab="fix"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v18M4 12h16" stroke="currentColor" stroke-width="1.8"/></svg><span>Fix</span></button><button class="tab" data-tab="garage"><svg viewBox="0 0 24 24" fill="none"><path d="M5 4h11l3 3v13H5z" stroke="currentColor" stroke-width="1.7"/></svg><span>Garage</span></button></div></nav>
 
   <script>
-    const games = {
-      "Forza Horizon 1": { types: ["Street", "Road", "Dirt", "Rally", "Drift"], no: ["Aero"] },
-      "Forza Horizon 2": { types: ["Street", "Road", "Dirt", "Rally", "Drift"], no: [] },
-      "Forza Horizon 3": { types: ["Street", "Road", "Dirt", "Rally", "Drift", "Drag"], no: [] },
-      "Forza Horizon 4": { types: ["Street", "Road", "Dirt", "Rally", "Drift", "Drag", "Cross Country"], no: [] },
-      "Forza Horizon 5": { types: ["Street", "Road", "Dirt", "Rally", "Drift", "Drag", "Cross Country"], no: [] },
-      "Forza Horizon 6": { types: ["Street", "Road", "Dirt", "Rally", "Drift", "Drag", "Cross Country"], no: [] },
-      "Forza Motorsport 5": { types: ["Circuit", "Grip", "Drift", "Drag"], no: ["Rally"] },
-      "Forza Motorsport 6": { types: ["Circuit", "Grip", "Drift", "Drag", "Rain"], no: ["Rally"] },
-      "Forza Motorsport 7": { types: ["Circuit", "Grip", "Drift", "Drag", "Rain"], no: ["Rally"] },
-      "Forza Motorsport 2023": { types: ["Circuit", "Grip", "Endurance", "Drift", "Drag", "Wet"], no: ["Rally"] }
-    };
-
-    const icons = {
-      Tires: '<path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 4a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z" stroke="currentColor" stroke-width="1.7" fill="none"/>',
-      Gearing: '<path d="M6 4v16M12 4v16M18 4v16M6 8h6M12 14h6" stroke="currentColor" stroke-width="1.7"/>',
-      Alignment: '<path d="M7 4l2 16M17 4l-2 16M4 12h16" stroke="currentColor" stroke-width="1.7"/>',
-      'Anti-roll bars': '<path d="M5 15c3-6 11-6 14 0M7 18h10M5 12h3M16 12h3" stroke="currentColor" stroke-width="1.7" fill="none"/>',
-      Springs: '<path d="M8 4c8 0 8 3 0 3s-8 3 0 3 8 3 0 3-8 3 0 3 8 3 0 3" stroke="currentColor" stroke-width="1.7" fill="none"/>',
-      Dampers: '<path d="M12 3v5M12 16v5M8 8h8v8H8zM6 11h12" stroke="currentColor" stroke-width="1.7" fill="none"/>',
-      Aero: '<path d="M4 15c5-7 11-8 17-6-4 2-6 5-6 9H4z" stroke="currentColor" stroke-width="1.7" fill="none"/>',
-      Brakes: '<path d="M12 4a8 8 0 1 0 0 16M12 8a4 4 0 1 0 0 8M15 5l4 4" stroke="currentColor" stroke-width="1.7" fill="none"/>',
-      Differential: '<path d="M5 12h14M8 8l8 8M16 8l-8 8M12 5v14" stroke="currentColor" stroke-width="1.7"/>'
-    };
-
-    const allSections = [
-      { name: 'Tires', hint: 'Pressure changes grip and response.', controls: [['Front PSI',24,40,29,.1], ['Rear PSI',24,40,29,.1]] },
-      { name: 'Gearing', hint: 'Shorter for acceleration, taller for speed.', controls: [['Final Drive',2.2,6,3.7,.01], ['1st Gear',1.5,5,3.2,.01], ['Top Gear',.5,1.6,.9,.01]] },
-      { name: 'Alignment', hint: 'Controls corner bite and straight line stability.', controls: [['Front Camber',-5,1,-1.5,.1], ['Rear Camber',-5,1,-1,.1], ['Front Toe',-2,2,0,.1], ['Caster',3,7,5.5,.1]] },
-      { name: 'Anti-roll bars', hint: 'Balance understeer and rotation.', controls: [['Front ARB',1,65,28,.1], ['Rear ARB',1,65,24,.1]] },
-      { name: 'Springs', hint: 'Balance grip, weight transfer, and ride height.', controls: [['Front Springs',100,1200,520,1], ['Rear Springs',100,1200,480,1], ['Ride Height',3,10,5,.1]] },
-      { name: 'Dampers', hint: 'Control body movement and stability.', controls: [['Front Rebound',1,20,8,.1], ['Rear Rebound',1,20,7.5,.1], ['Front Bump',1,15,4.5,.1], ['Rear Bump',1,15,4.2,.1]] },
-      { name: 'Aero', hint: 'Adds high speed grip at the cost of speed.', controls: [['Front Aero',0,100,35,1], ['Rear Aero',0,100,55,1]] },
-      { name: 'Brakes', hint: 'Bias and pressure affect stability under braking.', controls: [['Brake Balance',40,65,52,1], ['Brake Pressure',80,150,105,1]] },
-      { name: 'Differential', hint: 'Controls power delivery and lift off stability.', controls: [['Accel Lock',0,100,45,1], ['Decel Lock',0,100,18,1]] }
-    ];
-
-    const state = {};
-    const gameSelect = document.getElementById('gameSelect');
-    const typeSelect = document.getElementById('typeSelect');
-    const sectionsEl = document.getElementById('sections');
-
-    function idFor(text) { return text.toLowerCase().replace(/[^a-z0-9]+/g, '-'); }
-
-    function initTabs() {
-      document.querySelectorAll('.tab').forEach(button => {
-        button.addEventListener('click', () => {
-          const tab = button.dataset.tab;
-          document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
-          document.querySelectorAll('.page').forEach(page => page.classList.toggle('active', page.id === `page-${tab}`));
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-      });
-    }
-
-    function initSelectors() {
-      Object.keys(games).forEach(game => gameSelect.add(new Option(game, game)));
-      gameSelect.value = 'Forza Horizon 5';
-      gameSelect.addEventListener('change', () => { populateTypes(); renderSections(); updateProfile(); autosave(); });
-      typeSelect.addEventListener('change', () => { renderSections(); updateProfile(); autosave(); });
-      document.getElementById('weight').addEventListener('input', autosave);
-      document.getElementById('frontWeight').addEventListener('input', autosave);
-      populateTypes();
-    }
-
-    function populateTypes() {
-      const oldType = typeSelect.value;
-      const types = games[gameSelect.value].types;
-      typeSelect.innerHTML = '';
-      types.forEach(type => typeSelect.add(new Option(type, type)));
-      typeSelect.value = types.includes(oldType) ? oldType : types[0];
-      updateProfile();
-    }
-
-    function activeSections() {
-      const hidden = games[gameSelect.value].no || [];
-      return allSections.filter(section => !hidden.includes(section.name));
-    }
-
-    function surfaceFor(type) {
-      if (['Dirt', 'Rally', 'Cross Country'].includes(type)) return 'Loose';
-      if (['Rain', 'Wet'].includes(type)) return 'Wet';
-      return 'Road';
-    }
-
-    function shortGame(game) {
-      return game.replace('Forza Horizon ', 'FH').replace('Forza Motorsport ', 'FM');
-    }
-
-    function updateProfile() {
-      const game = gameSelect.value;
-      const type = typeSelect.value;
-      document.getElementById('profileTitle').textContent = `${game} ${type}`;
-      document.getElementById('topProfile').textContent = `${shortGame(game)} · ${type}`;
-      document.getElementById('surfaceStat').textContent = surfaceFor(type);
-      document.getElementById('sectionStat').textContent = activeSections().length;
-    }
-
-    function renderSections() {
-      sectionsEl.innerHTML = '';
-      activeSections().forEach((section, index) => {
-        const details = document.createElement('details');
-        details.className = 'tune-card';
-        if (index < 2) details.open = true;
-        details.innerHTML = `<summary><div class="section-title"><div class="icon"><svg viewBox="0 0 24 24" fill="none">${icons[section.name]}</svg></div><div><h3>${section.name}</h3><p class="hint">${section.hint}</p></div></div><span class="chev">⌄</span></summary><div class="section-controls"></div>`;
-        const body = details.querySelector('.section-controls');
-        section.controls.forEach(([label, min, max, defaultValue, step]) => {
-          if (state[label] === undefined) state[label] = defaultValue;
-          const id = idFor(label);
-          const control = document.createElement('div');
-          control.className = 'control';
-          control.innerHTML = `<div class="label-row"><label for="${id}">${label}</label><span class="value" id="${id}-value">${state[label]}</span></div><input type="range" id="${id}" min="${min}" max="${max}" value="${state[label]}" step="${step}" data-label="${label}">`;
-          body.appendChild(control);
-        });
-        sectionsEl.appendChild(details);
-      });
-
-      document.querySelectorAll('input[type="range"]').forEach(slider => {
-        slider.addEventListener('input', event => {
-          const label = event.target.dataset.label;
-          state[label] = Number(event.target.value);
-          const value = document.getElementById(`${event.target.id}-value`);
-          if (value) value.textContent = event.target.value;
-          autosave();
-        });
-      });
-      updateProfile();
-    }
-
-    function setVal(label, value) {
-      state[label] = Number(value);
-      const slider = document.getElementById(idFor(label));
-      if (!slider) return;
-      slider.value = value;
-      const display = document.getElementById(`${slider.id}-value`);
-      if (display) display.textContent = slider.value;
-    }
-
-    function applyBaseline() {
-      const weight = Number(document.getElementById('weight').value) || 3200;
-      const front = Number(document.getElementById('frontWeight').value) || 52;
-      const rear = 100 - front;
-      const type = typeSelect.value || 'Street';
-      let tire = 29, arbAdd = 0, springMul = .32, aeroF = 38, aeroR = 58, accel = 45, decel = 18;
-
-      if (['Dirt', 'Rally', 'Cross Country'].includes(type)) { tire = 26.5; arbAdd = -6; springMul = .26; aeroF = 30; aeroR = 48; accel = 35; decel = 12; }
-      if (type === 'Drift') { tire = 32; arbAdd = 6; springMul = .34; aeroF = 20; aeroR = 28; accel = 85; decel = 65; }
-      if (type === 'Drag') { tire = 28; arbAdd = -3; springMul = .30; aeroF = 10; aeroR = 18; accel = 90; decel = 8; }
-      if (['Circuit', 'Grip', 'Endurance'].includes(type)) { tire = 28.5; arbAdd = 2; springMul = .33; aeroF = 50; aeroR = 70; accel = 55; decel = 22; }
-
-      setVal('Front Springs', Math.round(weight * (front / 100) * springMul));
-      setVal('Rear Springs', Math.round(weight * (rear / 100) * springMul));
-      setVal('Front ARB', Math.max(1, Math.round(16 + front * .28 + arbAdd)));
-      setVal('Rear ARB', Math.max(1, Math.round(16 + rear * .24 + arbAdd)));
-      setVal('Front PSI', tire);
-      setVal('Rear PSI', type === 'Drift' ? 35 : tire + .5);
-      setVal('Brake Balance', Math.round(49 + front * .07));
-      setVal('Front Aero', aeroF);
-      setVal('Rear Aero', aeroR);
-      setVal('Accel Lock', accel);
-      setVal('Decel Lock', decel);
-      autosave();
-      showTab('tune');
-    }
-
-    function showTab(tab) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
-      document.querySelectorAll('.page').forEach(page => page.classList.toggle('active', page.id === `page-${tab}`));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function collect() {
-      return { ...state, game: gameSelect.value, type: typeSelect.value, weight: document.getElementById('weight').value, frontWeight: document.getElementById('frontWeight').value };
-    }
-
-    function apply(data) {
-      if (data.game && games[data.game]) gameSelect.value = data.game;
-      populateTypes();
-      if (data.type && games[gameSelect.value].types.includes(data.type)) typeSelect.value = data.type;
-      document.getElementById('weight').value = data.weight || 3200;
-      document.getElementById('frontWeight').value = data.frontWeight || 52;
-      Object.entries(data).forEach(([key, value]) => {
-        if (!['game', 'type', 'weight', 'frontWeight'].includes(key)) state[key] = Number(value);
-      });
-      renderSections();
-      Object.entries(state).forEach(([key, value]) => setVal(key, value));
-      updateProfile();
-      autosave();
-    }
-
-    function autosave() { localStorage.setItem('apex-tuner-autosave', JSON.stringify(collect())); }
-    function loadAutosave() { const saved = localStorage.getItem('apex-tuner-autosave') || localStorage.getItem('forza-tuner-autosave'); if (saved) apply(JSON.parse(saved)); }
-    function resetTune() { localStorage.removeItem('apex-tuner-autosave'); location.reload(); }
-    function presets() { return JSON.parse(localStorage.getItem('apex-tuner-presets') || localStorage.getItem('forza-tuner-presets') || '[]'); }
-
-    function savePreset() {
-      const name = document.getElementById('presetName').value.trim() || `${shortGame(gameSelect.value)} ${typeSelect.value} Tune`;
-      const list = presets();
-      list.unshift({ name, data: collect(), date: Date.now() });
-      localStorage.setItem('apex-tuner-presets', JSON.stringify(list.slice(0, 40)));
-      document.getElementById('presetName').value = '';
-      renderPresets();
-    }
-
-    function loadPreset(index) { apply(presets()[index].data); showTab('tune'); }
-    function deletePreset(index) { const list = presets(); list.splice(index, 1); localStorage.setItem('apex-tuner-presets', JSON.stringify(list)); renderPresets(); }
-    function clearPresets() { if (confirm('Clear all saved tune presets?')) { localStorage.removeItem('apex-tuner-presets'); localStorage.removeItem('forza-tuner-presets'); renderPresets(); } }
-
-    function renderPresets() {
-      const list = presets();
-      const el = document.getElementById('presetList');
-      el.innerHTML = list.length ? '' : '<p class="hint">No saved presets yet.</p>';
-      list.forEach((preset, index) => {
-        const item = document.createElement('div');
-        item.className = 'preset-item';
-        const game = preset.data?.game || 'Unknown game';
-        const type = preset.data?.type || 'Tune';
-        item.innerHTML = `<div><div class="preset-name">${preset.name}</div><div class="preset-meta">${shortGame(game)} · ${type}</div></div><div class="preset-actions"><button class="btn secondary" onclick="loadPreset(${index})">Load</button><button class="btn danger" onclick="deletePreset(${index})">Delete</button></div>`;
-        el.appendChild(item);
-      });
-    }
-
-    const fixes = {
-      'under-entry': 'Try less front brake bias, softer front ARB, or more front negative camber. If braking hard, lower brake pressure slightly.',
-      'under-mid': 'Add front grip. Lower front tire pressure a touch, soften front ARB, or stiffen rear ARB slightly. Do small changes only.',
-      'under-exit': 'Reduce accel diff lock, soften rear springs, or raise rear tire pressure slightly if the rear is squatting too much.',
-      'over-entry': 'Add stability. Increase front brake bias, soften rear rebound, lower decel diff, or soften rear ARB.',
-      'over-mid': 'Reduce rotation. Soften rear ARB, stiffen front ARB a little, or lower rear tire pressure for more rear grip.',
-      'over-exit': 'Lower accel diff lock, soften rear springs, reduce rear rebound, or use taller gearing to calm wheelspin.',
-      'unstable': 'Start with lower toe values, softer ARBs, more rear aero, and bump damping around 50 to 60 percent of rebound.'
-    };
-
-    function showFix() { document.getElementById('fixText').textContent = fixes[document.getElementById('issue').value]; }
-
-    async function reloadApp() {
-      try {
-        if ('caches' in window) {
-          const keys = await caches.keys();
-          await Promise.all(keys.map(key => caches.delete(key)));
-        }
-      } catch (error) {}
-      location.reload();
-    }
-
-    initTabs();
-    initSelectors();
-    renderSections();
-    showFix();
-    loadAutosave();
-    renderPresets();
+    const gameTypes={"Forza Horizon 1":["Street","Road","Dirt","Rally","Drift"],"Forza Horizon 2":["Street","Road","Dirt","Rally","Drift"],"Forza Horizon 3":["Street","Road","Dirt","Rally","Drift","Drag"],"Forza Horizon 4":["Street","Road","Dirt","Rally","Drift","Drag","Cross Country"],"Forza Horizon 5":["Street","Road","Dirt","Rally","Drift","Drag","Cross Country"],"Forza Horizon 6":["Street","Road","Dirt","Rally","Drift","Drag","Cross Country"],"Forza Motorsport 5":["Circuit","Grip","Drift","Drag"],"Forza Motorsport 6":["Circuit","Grip","Drift","Drag","Rain"],"Forza Motorsport 7":["Circuit","Grip","Drift","Drag","Rain"],"Forza Motorsport 2023":["Circuit","Grip","Endurance","Drift","Drag","Wet"]};
+    let currentTune=null;
+    const $=id=>document.getElementById(id);
+    function num(id,fallback){return Number($(id).value)||fallback}
+    function shortGame(g){return g.replace('Forza Horizon ','FH').replace('Forza Motorsport ','FM')}
+    function round(v,d=1){return Number(v).toFixed(d).replace(/\.0$/,'')}
+    function showTab(tab){document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===tab));document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active',p.id===`page-${tab}`));window.scrollTo({top:0,behavior:'smooth'})}
+    function initTabs(){document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)))}
+    function initBuild(){const game=$('gameSelect');Object.keys(gameTypes).forEach(g=>game.add(new Option(g,g)));game.value='Forza Horizon 5';game.addEventListener('change',populateRaceTypes);['raceType','classTarget','goalSelect','drivetrain','engineLayout','weight','frontWeight','power','tireCompound','aeroPackage','transmission'].forEach(id=>$(id).addEventListener('input',updateSummary));populateRaceTypes();updateSummary();const saved=localStorage.getItem('apex-tuner-current');if(saved){try{currentTune=JSON.parse(saved);renderTune(currentTune)}catch(e){}}}
+    function populateRaceTypes(){const old=$('raceType').value;const types=gameTypes[$('gameSelect').value];$('raceType').innerHTML='';types.forEach(t=>$('raceType').add(new Option(t,t)));$('raceType').value=types.includes(old)?old:types[0];updateSummary()}
+    function updateSummary(){const game=$('gameSelect').value,type=$('raceType').value,drive=$('drivetrain').value,goal=$('goalSelect').value;$('summaryBuild').textContent=`${shortGame(game)} ${type}`;$('summaryGoal').textContent=goal;$('topProfile').textContent=`${shortGame(game)} · ${type} · ${drive}`}
+    function buildData(){return{game:$('gameSelect').value,type:$('raceType').value,klass:$('classTarget').value,goal:$('goalSelect').value,drive:$('drivetrain').value,engine:$('engineLayout').value,weight:num('weight',3200),front:num('frontWeight',52),power:num('power',500),tire:$('tireCompound').value,aero:$('aeroPackage').value,trans:$('transmission').value}}
+    function generateTune(goResults=false){const d=buildData();const rear=100-d.front;let tireBase=29,spring=.32,arb=0,aeroF=40,aeroR=60,brakeP=105,finalDrive=3.70,accel=50,decel=18,camberF=-1.5,camberR=-1.0,toeF=0,toeR=0,caster=5.5,ride=5;
+      if(['Dirt','Rally','Cross Country'].includes(d.type)){tireBase=26.2;spring=.26;arb=-6;aeroF=28;aeroR=45;brakeP=95;finalDrive=4.10;accel=38;decel=12;camberF=-1.0;camberR=-0.6;caster=5.2;ride=7.2}
+      if(['Circuit','Grip','Endurance'].includes(d.type)){tireBase=28.5;spring=.34;arb=2;aeroF=55;aeroR=72;brakeP=110;finalDrive=3.55;accel=58;decel=22;camberF=-1.8;camberR=-1.2;caster=6.0;ride=4.8}
+      if(['Wet','Rain'].includes(d.type)){tireBase=27.3;spring=.30;arb=-3;aeroF=50;aeroR=70;brakeP=96;finalDrive=3.70;accel=42;decel=16;camberF=-1.3;camberR=-0.9;caster=5.5;ride=5.6}
+      if(d.type==='Drift'){tireBase=32;spring=.34;arb=6;aeroF=18;aeroR=28;brakeP=115;finalDrive=3.90;accel=86;decel=64;camberF=-4.2;camberR=-1.2;toeF=0.5;toeR=0.0;caster=7.0;ride=5.3}
+      if(d.type==='Drag'){tireBase=28;spring=.29;arb=-5;aeroF=5;aeroR=12;brakeP=100;finalDrive=3.35;accel=90;decel=8;camberF=0;camberR=0;toeF=0;toeR=0;caster=5.0;ride=4.6}
+      if(d.goal==='Grip'){camberF-=.2;camberR-=.1;aeroF+=5;aeroR+=8;brakeP+=2}
+      if(d.goal==='Rotation'){arb+=3;decel-=3;toeF+=.1;aeroR-=4}
+      if(d.goal==='Stability'){arb-=2;decel+=4;aeroR+=6;toeF-=.05}
+      if(d.goal==='Acceleration'){finalDrive+=.25;accel+=6}
+      if(d.goal==='Top Speed'){finalDrive-=.3;aeroF-=8;aeroR-=10}
+      if(d.drive==='FWD'){accel-=12;decel-=5;arb-=2}
+      if(d.drive==='RWD'){accel+=5}
+      if(d.drive==='AWD'){accel-=3;decel-=2}
+      if(d.engine==='Mid'){aeroR+=4;camberR-=.1}
+      if(d.engine==='Rear'){aeroR+=8;camberR-=.15;arb-=1}
+      if(d.tire==='Rally')tireBase-=.8;if(d.tire==='Drag')tireBase-=1;if(d.tire==='Drift')tireBase+=2;if(d.tire==='Slick')tireBase+=.3;
+      const frontSpring=Math.round(d.weight*(d.front/100)*spring);const rearSpring=Math.round(d.weight*(rear/100)*spring);let frontArb=Math.max(1,Math.round(16+d.front*.28+arb));let rearArb=Math.max(1,Math.round(16+rear*.24+arb));if(d.goal==='Rotation')rearArb+=3;if(d.goal==='Stability')frontArb+=2;
+      const aeroRows=[];if(d.aero==='None'){aeroRows.push(['Front Aero','Not installed'],['Rear Aero','Not installed'])}else{aeroRows.push(['Front Aero',d.aero==='Rear Only'?'Not installed':`${Math.max(0,Math.round(aeroF))}%`],['Rear Aero',d.aero==='Front Only'?'Not installed':`${Math.max(0,Math.round(aeroR))}%`])}
+      const diffRows=[];if(d.drive==='FWD'){diffRows.push(['Front Accel',`${clamp(accel-10,0,100)}%`],['Front Decel',`${clamp(decel-6,0,100)}%`])}else if(d.drive==='RWD'){diffRows.push(['Rear Accel',`${clamp(accel+5,0,100)}%`],['Rear Decel',`${clamp(decel,0,100)}%`])}else{diffRows.push(['Front Accel',`${clamp(accel-25,0,100)}%`],['Front Decel',`${clamp(decel-8,0,100)}%`],['Rear Accel',`${clamp(accel+5,0,100)}%`],['Rear Decel',`${clamp(decel,0,100)}%`],['Center Balance',d.type==='Drift'?'78% rear':'65% rear'])}
+      currentTune={meta:d,title:`${shortGame(d.game)} ${d.klass} ${d.type} ${d.drive}`,sections:[{name:'Tires',rows:[['Front PSI',round(tireBase)],['Rear PSI',round(d.type==='Drift'?tireBase+3:tireBase+.5)]]},{name:'Gearing',rows:[['Final Drive',round(finalDrive,2)],['1st Gear','Shorten if launch bogs'],['Top Gear','Set for longest straight']]},{name:'Alignment',rows:[['Front Camber',round(camberF)],['Rear Camber',round(camberR)],['Front Toe',round(toeF)],['Rear Toe',round(toeR)],['Caster',round(caster)]]},{name:'Anti Roll Bars',rows:[['Front ARB',frontArb],['Rear ARB',rearArb]]},{name:'Springs',rows:[['Front Springs',frontSpring],['Rear Springs',rearSpring],['Ride Height',round(ride)]]},{name:'Dampers',rows:[['Front Rebound',round(typeVal(d.type,8,6,10,7.5))],['Rear Rebound',round(typeVal(d.type,7.5,5.8,9,7.2))],['Front Bump',round(typeVal(d.type,4.5,3.2,5.5,4.1))],['Rear Bump',round(typeVal(d.type,4.2,3.0,5.0,3.9))]]},{name:'Aero',rows:aeroRows},{name:'Brakes',rows:[['Balance',`${Math.round(49+d.front*.07)}% front`],['Pressure',`${Math.round(brakeP)}%`]]},{name:'Differential',rows:diffRows}]};
+      localStorage.setItem('apex-tuner-current',JSON.stringify(currentTune));renderTune(currentTune);if(goResults)showTab('results')}
+    function clamp(v,min,max){return Math.max(min,Math.min(max,Math.round(v)))}
+    function typeVal(type,road,loose,drift,wet){if(['Dirt','Rally','Cross Country'].includes(type))return loose;if(type==='Drift')return drift;if(['Wet','Rain'].includes(type))return wet;return road}
+    function renderTune(tune){if(!tune)return;$('resultsTitle').textContent=tune.title;$('resultsHint').textContent='Copy these settings into the game. Treat it as a strong baseline, then use Fix after a test drive.';const grid=$('resultsGrid');grid.innerHTML='';tune.sections.forEach(section=>{const card=document.createElement('section');card.className='result-card';card.innerHTML=`<div class="result-head"><div class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5v14" stroke="currentColor" stroke-width="1.8"/></svg></div><h3>${section.name}</h3></div><div class="result-body">${section.rows.map(row=>`<div class="row"><span>${row[0]}</span><strong>${row[1]}</strong></div>`).join('')}</div>`;grid.appendChild(card)})}
+    function savePreset(){if(!currentTune)generateTune(false);const name=$('presetName').value.trim()||currentTune.title;const list=presets();list.unshift({name,tune:currentTune,date:Date.now()});localStorage.setItem('apex-tuner-presets',JSON.stringify(list.slice(0,40)));$('presetName').value='';renderPresets()}
+    function presets(){return JSON.parse(localStorage.getItem('apex-tuner-presets')||'[]')}
+    function renderPresets(){const list=presets(),el=$('presetList');el.innerHTML=list.length?'':'<p class="hint">No saved presets yet.</p>';list.forEach((p,i)=>{const meta=p.tune?.title||'Tune';const item=document.createElement('div');item.className='preset-item';item.innerHTML=`<div><div class="preset-name">${p.name}</div><div class="preset-meta">${meta}</div></div><div class="preset-actions"><button class="btn secondary" onclick="loadPreset(${i})">Load</button><button class="btn danger" onclick="deletePreset(${i})">Delete</button></div>`;el.appendChild(item)})}
+    function loadPreset(i){currentTune=presets()[i].tune;localStorage.setItem('apex-tuner-current',JSON.stringify(currentTune));renderTune(currentTune);showTab('results')}
+    function deletePreset(i){const list=presets();list.splice(i,1);localStorage.setItem('apex-tuner-presets',JSON.stringify(list));renderPresets()}
+    function clearPresets(){if(confirm('Clear all saved tune presets?')){localStorage.removeItem('apex-tuner-presets');renderPresets()}}
+    const fixes={'under-entry':'Try less front brake bias, softer front ARB, or more front negative camber. If braking hard, lower brake pressure slightly.','under-mid':'Add front grip. Lower front tire pressure a touch, soften front ARB, or stiffen rear ARB slightly.','under-exit':'Reduce accel diff lock, soften rear springs, or raise rear tire pressure slightly if the rear squats too much.','over-entry':'Add stability. Increase front brake bias, soften rear rebound, lower decel diff, or soften rear ARB.','over-mid':'Reduce rotation. Soften rear ARB, stiffen front ARB a little, or lower rear tire pressure for more rear grip.','over-exit':'Lower accel diff lock, soften rear springs, reduce rear rebound, or use taller gearing to calm wheelspin.','unstable':'Start with lower toe values, softer ARBs, more rear aero, and bump damping around 50 to 60 percent of rebound.'};
+    function showFix(){$('fixText').textContent=fixes[$('issue').value]}
+    async function reloadApp(){try{if('caches'in window){const keys=await caches.keys();await Promise.all(keys.map(k=>caches.delete(k)))}}catch(e){}location.reload()}
+    initTabs();initBuild();showFix();renderPresets();
   </script>
 </body>
 </html>
